@@ -30,7 +30,6 @@ u8 RAM[0xFFFF];
 // cpu
 u8 OP;
 
-
 int main() {
 	// read rom file and loop over it to print instructions
 	char rom[8096] = {};
