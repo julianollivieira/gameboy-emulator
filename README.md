@@ -1,8 +1,9 @@
 # gameboy-emulator
 
-a gameboy emulator i am writing in c to get some basic experience with the language
+a gameboy emulator i am writing in c99 to get some basic experience with the language
 
 ## features
+
 - [ ] instructions
   - [ ] misc / control
   - [ ] jumps / calls
@@ -14,3 +15,7 @@ a gameboy emulator i am writing in c to get some basic experience with the langu
 - [ ] audio
 - [ ] input
 - [ ] rendering / graphics
+
+## build & run
+
+you can build the project using `make` and run it using `./gameboy`
