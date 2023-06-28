@@ -29,6 +29,9 @@ u8 RAM[0xFFFF];
 
 // cpu
 u8 OP;
+u8 NN;
+u8 NN2;
+u16 NNN;
 
 int main() {
 	// read rom file and loop over it to print instructions
@@ -40,6 +43,7 @@ int main() {
 	// loop over rom and execute instructions
 	for(;;) {
 		OP = rom[PC++];
+
 		switch (OP) {
 			// 8-bit load instructions
 			case 0x02:
@@ -52,24 +56,33 @@ int main() {
 				break;
 			case 0x22:
 				printf("LD (HL+),A");
-				// TODO: RAM[R_HL] = R_A;
+				RAM[R_HL] = R_A;
+				R_HL++;
 				break;
 			case 0x32: 
 				printf("LD (HL-),A");
-				// TODO: RAM[R_HL] = R_A;
+				RAM[R_HL] = R_A;
+				R_HL--;
 				break;
 			case 0x06:
-				// printf("LD B,%02X", rom[PC++]);
-				// TODO: R_B = rom[PC++];
+				NN = rom[PC++];
+				printf("LD B,%02X", NN);
+				R_B = NN;
 				break;
 			case 0x16:
-				// TODO: printf("LD D,%02X", rom[PC++]);
+				NN = rom[PC++];
+				printf("LD D,%02X", NN);
+				R_D = NN;
 				break;
 			case 0x26:
-				// TODO: printf("LD H,%02X", rom[PC++]);
+				NN = rom[PC++];
+				printf("LD H,%02X", NN);
+				R_H = NN;
 				break;
 			case 0x36:
-				// TODO: printf("LD (HL),%02X", rom[PC++]);
+				NN = rom[PC++];
+				printf("LD (HL),%02X", NN);
+				RAM[R_HL] = NN;
 				break;
 			case 0x0A:
 				printf("LD A,(BC)");
@@ -81,30 +94,37 @@ int main() {
 				break;
 			case 0x2A:
 				printf("LD A,(HL+)");
-				// TODO: R_A = RAM[R_HL];
+				R_A = RAM[R_HL];
+				R_HL++;
 				break;
 			case 0x3A:
 				printf("LD A,(HL-)");
-				// TODO: R_A = RAM[R_HL];
-				 break;
+				R_A = RAM[R_HL];
+				R_HL--;
+				break;
 			case 0x0E:
-				// printf("LD C,%02X", rom[PC++]);
-				// TODO: R_C = rom[PC++];
+				NN = rom[PC++];
+				printf("LD C,%02X", NN);
+				R_C = NN;
 				break;
 			case 0x1E:
-				// printf("LD E,%02X", rom[PC++]);
-				// TODO: R_E = rom[PC++];
+				NN = rom[PC++];
+				printf("LD E,%02X", NN);
+				R_E = NN;
 				break;
 			case 0x2E:
-				// printf("LD L,%02X", rom[PC++]);
-				// TODO: R_L = rom[PC++];
+				NN = rom[PC++];
+				printf("LD L,%02X", NN);
+				R_L = NN;
 				break;
 			case 0x3E:
-				// printf("LD A,%02X", rom[PC++]);
-				// TODO: R_A = rom[PC++];
+				NN = rom[PC++];
+				printf("LD A,%02X", NN);
+				R_A = NN;
 				break;
 			case 0x40:
 				printf("LD B,B");
+				// NOP
 				break;
 			case 0x41:
 				printf("LD B,C");
@@ -174,6 +194,7 @@ int main() {
 				break;
 			case 0x52:
 				printf("LD D,D");
+				// NOP
 				break;
 			case 0x53:
 				printf("LD D,E");
@@ -209,6 +230,7 @@ int main() {
 				break;
 			case 0x5B:
 				printf("LD E,E");
+				// NOP
 				break;
 			case 0x5C:
 				printf("LD E,H");
@@ -290,90 +312,97 @@ int main() {
 				R_E = R_A;
 				break;
 			case 0x70:
-				printf("LD H,B");
-				R_H = R_B;
+				printf("LD (HL),B");
+				RAM[R_HL] = R_B;
 				break;
 			case 0x71:
-				printf("LD H,C");
-				R_H = R_C;
+				printf("LD (HL),C");
+				RAM[R_HL] = R_C;
 				break;
 			case 0x72:
-				printf("LD H,D");
-				R_H = R_D;
+				printf("LD (HL),D");
+				RAM[R_HL] = R_D;
 				break;
 			case 0x73:
-				printf("LD H,E");
-				R_H = R_E;
+				printf("LD (HL),E");
+				RAM[R_HL] = R_E;
 				break;
 			case 0x74:
-				printf("LD H,H");
+				printf("LD (HL),H");
+				RAM[R_HL] = R_H;
 				break;
 			case 0x75:
-				printf("LD H,L");
-				R_H = R_L;
+				printf("LD (HL),L");
+				RAM[R_HL] = R_L;
 				break;
 			case 0x76:
-				printf("LD H,(HL)");
-				R_H = RAM[R_HL];
+				// TODO: halt
 				break;
 			case 0x77:
-				printf("LD H,A");
-				R_H = R_A;
+				printf("LD (HL),A");
+				RAM[R_HL] = R_A;
 				break;
 			case 0x78:
-				printf("LD L,B");
-				R_L = R_B;
+				printf("LD A,B");
+				R_A = R_B;
 				break;
 			case 0x79:
-				printf("LD L,C");
-				R_L = R_C;
+				printf("LD A,C");
+				R_A = R_C;
 				break;
 			case 0x7A:
-				printf("LD L,D");
-				R_L = R_D;
+				printf("LD A,D");
+				R_A = R_D;
 				break;
 			case 0x7B:
-				printf("LD L,E");
-				R_L = R_E;
+				printf("LD A,E");
+				R_A = R_E;
 				break;
 			case 0x7C:
-				printf("LD L,H");
-				R_L = R_H;
+				printf("LD A,H");
+				R_A = R_H;
 				break;
 			case 0x7D:
-				printf("LD L,L");
+				printf("LD A,L");
+				R_A = R_L;
 				break;
 			case 0x7E:
-				printf("LD L,(HL)");
-				R_L = RAM[R_HL];
+				printf("LD A,(HL)");
+				R_A = RAM[R_HL];
 				break;
 			case 0x7F:
-				printf("LD L,A");
-				R_L = R_A;
+				printf("LD A,A");
+				// NOP
 				break;
 			case 0xE0:
-				printf("LDH (a8),A");
-				// TODO: RAM[0xFF00 + a8] = R_A;
+				printf("LDH (u8),A");
+				RAM[0xFF00 + RAM[PC++]] = R_A;
 				break;
 			case 0xF0:
-				printf("LDH A,(a8)");
-				// TODO: R_A = RAM[0xFF00 + a8];
+				printf("LDH A,(u8)");
+				R_A = RAM[0xFF00 + RAM[PC++]];
 				break;
 			case 0xE2:
 				printf("LD (C),A");
-				// TODO: RAM[0xFF00 + R_C] = R_A;
+				RAM[0xFF00 + R_C] = R_A;
 				break;
 			case 0xF2:
 				printf("LD A,(C)");
-				// TODO: R_A = RAM[0xFF00 + R_C];
+				R_A = RAM[0xFF00 + R_C];
 				break;
 			case 0xEA:
 				printf("LD (a16),A");
-				// TODO: RAM[a16] = R_A;
+				NN = RAM[PC++];
+				NN2 = RAM[PC++];
+				NNN = (NN2 << 8) | NN;
+				RAM[NNN] = R_A;
 				break;
 			case 0xFA:
 				printf("LD A,(a16)");
-				// TODO: R_A = RAM[a16];
+				NN = RAM[PC++];
+				NN2 = RAM[PC++];
+				NNN = (NN2 << 8) | NN;
+				R_A = RAM[NNN];
 				break;
 		}
 
