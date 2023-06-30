@@ -33,6 +33,29 @@ u8 NN;
 u8 NN2;
 u16 NNN;
 
+// writes to a single register (8-bit) to a value
+void writereg(u8* reg, u8 value) {
+	*reg = value;
+}
+
+// writes to a double register (16-bit) to a value
+void writedreg(u8* high, u8* low, u16 value) {
+	*high = (value & 0xFF00) >> 8;
+	*low = value & 0x00FF;
+}
+
+// gets the next 8 bits of memory
+u8 next8() {
+	return RAM[PC++];
+}
+
+// gets the next 16 bits of memory
+u16 next16() {
+	u16 value = RAM[PC++];
+	value |= RAM[PC++] << 8;
+	return value;
+}
+
 int main() {
 	// read rom file and loop over it to print instructions
 	char rom[8096] = {};
@@ -404,6 +427,11 @@ int main() {
 				NNN = (NN2 << 8) | NN;
 				R_A = RAM[NNN];
 				break;
+
+			// 16-bit load instructions
+			case 0x01:
+				printf("LD BC,u16");
+				writedreg(&R_B, &R_C, next16());
 		}
 
 		printf("\n");
