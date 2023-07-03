@@ -29,9 +29,6 @@ u8 RAM[0xFFFF];
 
 // cpu
 u8 OP;
-u8 NN;
-u8 NN2;
-u16 NNN;
 
 // writes to a single register (8-bit) to a value
 void writereg(u8* reg, u8 value) {
@@ -44,11 +41,6 @@ void writedreg(u8* high, u8* low, u16 value) {
 	*low = value & 0x00FF;
 }
 
-// gets the next 8 bits of memory
-u8 next8() {
-	return RAM[PC++];
-}
-
 // gets the next 16 bits of memory
 u16 next16() {
 	u16 value = RAM[PC++];
@@ -56,16 +48,18 @@ u16 next16() {
 	return value;
 }
 
+#define N8 RAM[PC++]
+#define N16 next16()
+
 int main() {
 	// read rom file and loop over it to print instructions
-	char rom[8096] = {};
 	FILE* fptr = fopen("cpu_instrs.gb", "rb");
-	fread(rom, 1, 8096, fptr);
+	fread(RAM, 1, 8096, fptr);
 	fclose(fptr);
 
 	// loop over rom and execute instructions
 	for(;;) {
-		OP = rom[PC++];
+		OP = N8;
 
 		switch (OP) {
 			// 8-bit load instructions
@@ -88,24 +82,20 @@ int main() {
 				R_HL--;
 				break;
 			case 0x06:
-				NN = rom[PC++];
-				printf("LD B,%02X", NN);
-				R_B = NN;
+				printf("LD B,(u8)");
+				R_B = N8;
 				break;
 			case 0x16:
-				NN = rom[PC++];
-				printf("LD D,%02X", NN);
-				R_D = NN;
+				printf("LD D,(u8)");
+				R_D = N8;
 				break;
 			case 0x26:
-				NN = rom[PC++];
-				printf("LD H,%02X", NN);
-				R_H = NN;
+				printf("LD H,(u8)");
+				R_H = N8;
 				break;
 			case 0x36:
-				NN = rom[PC++];
-				printf("LD (HL),%02X", NN);
-				RAM[R_HL] = NN;
+				printf("LD (HL),(u8)");
+				RAM[R_HL] = N8;
 				break;
 			case 0x0A:
 				printf("LD A,(BC)");
@@ -126,24 +116,20 @@ int main() {
 				R_HL--;
 				break;
 			case 0x0E:
-				NN = rom[PC++];
-				printf("LD C,%02X", NN);
-				R_C = NN;
+				printf("LD C,(u8)");
+				R_C = N8;
 				break;
 			case 0x1E:
-				NN = rom[PC++];
-				printf("LD E,%02X", NN);
-				R_E = NN;
+				printf("LD E,(u8)");
+				R_E = N8;
 				break;
 			case 0x2E:
-				NN = rom[PC++];
-				printf("LD L,%02X", NN);
-				R_L = NN;
+				printf("LD L,(u8)");
+				R_L = N8;
 				break;
 			case 0x3E:
-				NN = rom[PC++];
-				printf("LD A,%02X", NN);
-				R_A = NN;
+				printf("LD A,(u8)");
+				R_A = N8;
 				break;
 			case 0x40:
 				printf("LD B,B");
@@ -399,11 +385,11 @@ int main() {
 				break;
 			case 0xE0:
 				printf("LDH (u8),A");
-				RAM[0xFF00 + RAM[PC++]] = R_A;
+				RAM[0xFF00 + N8] = R_A;
 				break;
 			case 0xF0:
 				printf("LDH A,(u8)");
-				R_A = RAM[0xFF00 + RAM[PC++]];
+				R_A = RAM[0xFF00 + N8];
 				break;
 			case 0xE2:
 				printf("LD (C),A");
@@ -415,23 +401,17 @@ int main() {
 				break;
 			case 0xEA:
 				printf("LD (a16),A");
-				NN = RAM[PC++];
-				NN2 = RAM[PC++];
-				NNN = (NN2 << 8) | NN;
-				RAM[NNN] = R_A;
+				RAM[N16] = R_A;
 				break;
 			case 0xFA:
 				printf("LD A,(a16)");
-				NN = RAM[PC++];
-				NN2 = RAM[PC++];
-				NNN = (NN2 << 8) | NN;
-				R_A = RAM[NNN];
+				R_A = RAM[N16];
 				break;
 
 			// 16-bit load instructions
 			case 0x01:
 				printf("LD BC,u16");
-				writedreg(&R_B, &R_C, next16());
+				writedreg(&R_B, &R_C, N16);
 		}
 
 		printf("\n");
